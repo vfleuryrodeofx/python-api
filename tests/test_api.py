@@ -3548,12 +3548,14 @@ class TestReadAdditionalFilterPresets(base.LiveTestBase):
         if field_name not in schema:
             self.sg.schema_field_create("Asset", "text", "Project Visibility Test")
 
-        # Grab any two projects that we can use for toggling the visible property with.
-        projects = self.sg.find(
-            "Project", [], order=[{"field_name": "id", "direction": "asc"}]
+        # Hide/show on the ephemeral CI project so concurrent matrix jobs do not race.
+        # Use the oldest site project as the control (find_one defaults to sorting by "id" ascending)
+        project_1 = self.project
+        project_2 = self.sg.find_one("Project", [["id", "is_not", project_1["id"]]])
+        self.assertIsNotNone(
+            project_2,
+            "A second project is required to test per-project field visibility.",
         )
-        project_1 = projects[0]
-        project_2 = projects[1]
 
         # First, reset the field visibility in a known state, i.e. visible for both projects,
         # in case the last test run failed midway through.
