@@ -860,7 +860,7 @@ class Shotgun(object):
         order: Optional[List[OrderItem]] = None,
         filter_operator: Optional[str] = None,
         retired_only: bool = False,
-        include_archived_projects: bool = True,
+        include_archived_projects: bool = False,
         additional_filter_presets: Optional[List[Dict[str, Any]]] = None,
     ) -> Optional[BaseEntity]:
         """
@@ -893,7 +893,7 @@ class Shotgun(object):
             retired. There is no option to return both retired and non-retired entities in the
             same query.
         :param bool include_archived_projects: Optional boolean flag to include entities whose projects
-            have been archived. Defaults to ``True``.
+            have been archived. Defaults to ``False``.
         :param list additional_filter_presets: Optional list of presets to further filter the result
             set, list has the form::
 
@@ -926,6 +926,7 @@ class Shotgun(object):
             retired_only,
             include_archived_projects=include_archived_projects,
             additional_filter_presets=additional_filter_presets,
+            called_from_find_one=True,
         )
 
         if results:
@@ -942,8 +943,9 @@ class Shotgun(object):
         limit: int = 0,
         retired_only: bool = False,
         page: int = 0,
-        include_archived_projects: bool = True,
+        include_archived_projects: bool = False,
         additional_filter_presets: Optional[List[Dict[str, Any]]] = None,
+        called_from_find_one: bool = False,
     ) -> List[BaseEntity]:
         """
         Find entities matching the given filters.
@@ -1021,7 +1023,7 @@ class Shotgun(object):
             retired. There is no option to return both retired and non-retired entities in the
             same query.
         :param bool include_archived_projects: Optional boolean flag to include entities whose projects
-            have been archived. Defaults to ``True``.
+            have been archived. Defaults to ``False``.
         :param list additional_filter_presets: Optional list of presets to further filter the result
             set, list has the form::
 
@@ -1216,7 +1218,7 @@ class Shotgun(object):
         summary_fields: List[Dict[str, str]],
         filter_operator: Optional[str] = None,
         grouping: Optional[List[GroupingItem]] = None,
-        include_archived_projects: bool = True,
+        include_archived_projects: bool = False,
     ) -> Dict[str, Any]:
         """
         Summarize field data returned by a query.

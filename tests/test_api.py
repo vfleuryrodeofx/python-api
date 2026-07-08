@@ -137,11 +137,11 @@ class TestShotgunApi(base.LiveTestBase):
         rv = self.sg.get_session_token()
         self.assertTrue(rv)
 
-    @base.skip("Skip")
     def test_upload_download(self):
         """Upload and download an attachment tests"""
         # upload / download only works against a live server because it does
         # not use the standard http interface
+        self.skipTest("Skip")
         if "localhost" in self.server_url:
             print("upload / down tests skipped for localhost")
             return
@@ -271,12 +271,12 @@ class TestShotgunApi(base.LiveTestBase):
         # cleanup
         os.remove(file_path)
 
-    @base.skip("Skip")
     @unittest.mock.patch("shotgun_api3.Shotgun._send_form")
     def test_upload_to_sg(self, mock_send_form):
         """
         Upload an attachment tests for _upload_to_sg()
         """
+        self.skipTest("Skip")
         self.sg.server_info["s3_direct_uploads_enabled"] = False
         mock_send_form.return_value = "1\n:123\nasd"
         this_dir, _ = os.path.split(__file__)
@@ -605,9 +605,9 @@ class TestShotgunApi(base.LiveTestBase):
 
     # end test_upload_thumbnail_in_create
 
-    @base.skip("Skip")
     def test_upload_thumbnail_for_version(self):
         """simple upload thumbnail for version test."""
+        self.skipTest("Skip")
         this_dir, _ = os.path.split(__file__)
         path = os.path.abspath(
             os.path.expanduser(os.path.join(this_dir, "sg_logo.jpg"))
@@ -644,9 +644,9 @@ class TestShotgunApi(base.LiveTestBase):
         }
         self.assertEqual(expected_clear_thumbnail, response_clear_thumbnail)
 
-    @base.skip("Skip")
     def test_upload_thumbnail_for_task(self):
         """simple upload thumbnail for task test."""
+        self.skipTest("Skip")
         this_dir, _ = os.path.split(__file__)
         path = os.path.abspath(
             os.path.expanduser(os.path.join(this_dir, "sg_logo.jpg"))
@@ -681,9 +681,9 @@ class TestShotgunApi(base.LiveTestBase):
         }
         self.assertEqual(expected_clear_thumbnail, response_clear_thumbnail)
 
-    @base.skip("Skipping testing upload thumbnails")
     def test_upload_thumbnail_with_upload_function(self):
         """Upload thumbnail via upload function test"""
+        self.skipTest("Skip")
         path = os.path.abspath(
             os.path.expanduser(os.path.join(os.path.dirname(__file__), "sg_logo.jpg"))
         )
@@ -770,9 +770,9 @@ class TestShotgunApi(base.LiveTestBase):
         self.sg.server_info["s3_enabled_upload_types"] = upload_types
         self.sg.server_info["s3_direct_uploads_enabled"] = direct_uploads_enabled
 
-    @base.skip("Skip")
     def test_linked_thumbnail_url(self):
         this_dir, _ = os.path.split(__file__)
+        self.skipTest("Skip")
         path = os.path.abspath(
             os.path.expanduser(os.path.join(this_dir, "sg_logo.jpg"))
         )
@@ -974,9 +974,9 @@ class TestShotgunApi(base.LiveTestBase):
             self.assertEqual(result["summaries"]["id"], 0)
             self.sg.update("Project", self.project["id"], {"archived": False})
 
-    @base.skip("Skip")
     def test_summary_values(self):
         """Test summarize return data"""
+        self.skipTest("Skip")
 
         # create three unique shots
         shot_prefix = uuid.uuid4().hex
@@ -1079,9 +1079,9 @@ class TestShotgunApi(base.LiveTestBase):
             sg._http_request.call_args.args[2],  # Get the body of the request
         )
 
-    @base.skip("Skip test_work_schedule")
     def test_work_schedule(self):
         """test_work_schedule tests WorkDayRules api"""
+        self.skipTest("Skip")
         self.maxDiff = None
 
         start_date = "2012-01-01"
@@ -2284,9 +2284,9 @@ class TestFollow(base.LiveTestBase):
             result = self.sg.unfollow(human_user, shot)
             assert result["unfollowed"]
 
-    @base.skip("Skipping user testing")
     def test_followers(self):
         """Test followers method"""
+        self.skipTest("Skip")
 
         if not self.sg.server_caps.version or self.sg.server_caps.version < (5, 1, 22):
             return
@@ -2605,11 +2605,11 @@ class TestScriptUserSudoAuth(base.LiveTestBase):
             {"projects": [self.project]},
         )
 
-    @base.skip("Skipping user testing")
     def test_user_is_creator(self):
         """
         Test 'sudo_as_login' option: on create, ensure appropriate user is set in created-by
         """
+        self.skipTest("Skip")
 
         if not self.sg.server_caps.version or self.sg.server_caps.version < (5, 3, 12):
             return
@@ -2677,10 +2677,10 @@ class TestHumanUserAuth(base.HumanUserAuthLiveTestBase):
     Testing the username/password authentication method
     """
 
-    @base.skip("Skipping user testing")
     def test_humanuser_find(self):
         """Called find, find_one for known entities as human user"""
         filters = []
+        self.skipTest("Skip")
         filters.append(["project", "is", self.project])
         filters.append(["id", "is", self.version["id"]])
 
@@ -2697,9 +2697,9 @@ class TestHumanUserAuth(base.HumanUserAuthLiveTestBase):
         self.assertEqual("Version", version["type"])
         self.assertEqual(self.version["id"], version["id"])
 
-    @base.skip("Skipping user testing")
     def test_humanuser_upload_thumbnail_for_version(self):
         """simple upload thumbnail for version test as human user."""
+        self.skipTest("Skip")
         this_dir, _ = os.path.split(__file__)
         path = os.path.abspath(
             os.path.expanduser(os.path.join(this_dir, "sg_logo.jpg"))
@@ -2762,10 +2762,10 @@ class TestSessionTokenAuth(base.SessionTokenAuthLiveTestBase):
             self.assertEqual("Version", version["type"])
             self.assertEqual(self.version["id"], version["id"])
 
-    @base.skip("Skip")
     def test_humanuser_upload_thumbnail_for_version(self):
         """simple upload thumbnail for version test as session based token user."""
 
+        self.skipTest("Skip")
         if self.sg.server_caps.version >= (5, 4, 1):
 
             this_dir, _ = os.path.split(__file__)
@@ -2805,10 +2805,10 @@ class TestSessionTokenAuth(base.SessionTokenAuthLiveTestBase):
 
 class TestProjectLastAccessedByCurrentUser(base.LiveTestBase):
     # Ticket #24681
-    @base.skip("Skipping user testing")
     def test_logged_in_user(self):
         if self.sg.server_caps.version and self.sg.server_caps.version < (5, 3, 20):
             return
+        self.skipTest("Skip")
 
         sg = shotgun_api3.Shotgun(
             self.config.server_url,
@@ -2841,10 +2841,10 @@ class TestProjectLastAccessedByCurrentUser(base.LiveTestBase):
             < current["last_accessed_by_current_user"]
         )
 
-    @base.skip("Skipping user testing")
     def test_pass_in_user(self):
         if self.sg.server_caps.version and self.sg.server_caps.version < (5, 3, 20):
             return
+        self.skipTest("Skip")
 
         sg = shotgun_api3.Shotgun(
             self.config.server_url,
@@ -2876,7 +2876,6 @@ class TestProjectLastAccessedByCurrentUser(base.LiveTestBase):
                 < current["last_accessed_by_current_user"]
             )
 
-    @base.skip("Skipping user testing")
     def test_sudo_as_user(self):
         self.skipTest("Skipping this as test user is not setup.")
         if self.sg.server_caps.version and self.sg.server_caps.version < (5, 3, 20):

@@ -154,8 +154,11 @@ class TestShotgunSummarize(unittest.TestCase):
     Does not require database connection or test data."""
 
     def setUp(self):
-        self.sg = api.Shotgun(
-            "http://server_path", "script_name", "api_key", connect=False
+        self.sg = api.Shotgun("http://server_path", "script_name", "api_key", connect=False)
+        # Pre-populate server_caps to avoid conflicts with include_archive_projects
+        # attribute now defaulting to False
+        self.sg._server_caps = api.shotgun.ServerCapabilities(
+            self.sg.config.server, {"version": (8, 0, 0)}
         )
 
     def test_filter_operator_none(self):
@@ -187,7 +190,6 @@ class TestShotgunSummarize(unittest.TestCase):
         result = self.get_call_rpc_params(args, {})
         actual_condition = result["filters"]["conditions"][0]
 
-    @patch("shotgun_api3.shotgun.ServerCapabilities")
     @mock.patch("shotgun_api3.Shotgun._call_rpc")
     def get_call_rpc_params(self, args, kws, call_rpc):
         """Return params sent to _call_rpc from summarize."""
@@ -206,16 +208,12 @@ class TestShotgunSummarize(unittest.TestCase):
 
     def test_grouping_type(self):
         """test_grouping_type tests that grouping parameter is a list or None"""
-        self.assertRaises(
-            ValueError, self.sg.summarize, "", [], [], grouping="Not a list"
-        )
+        self.assertRaises(ValueError, self.sg.summarize, "", [], [], grouping="Not a list")
 
 
 class TestShotgunBatch(unittest.TestCase):
     def setUp(self):
-        self.sg = api.Shotgun(
-            "http://server_path", "script_name", "api_key", connect=False
-        )
+        self.sg = api.Shotgun("http://server_path", "script_name", "api_key", connect=False)
 
     def test_missing_required_key(self):
         req = {}
@@ -255,15 +253,11 @@ class TestServerCapabilities(unittest.TestCase):
         )
 
     def test_dev_version(self):
-        serverCapabilities = api.shotgun.ServerCapabilities(
-            "host", {"version": (3, 4, 0, "Dev")}
-        )
+        serverCapabilities = api.shotgun.ServerCapabilities("host", {"version": (3, 4, 0, "Dev")})
         self.assertEqual(serverCapabilities.version, (3, 4, 0))
         self.assertTrue(serverCapabilities.is_dev)
 
-        serverCapabilities = api.shotgun.ServerCapabilities(
-            "host", {"version": (2, 4, 0)}
-        )
+        serverCapabilities = api.shotgun.ServerCapabilities("host", {"version": (2, 4, 0)})
         self.assertEqual(serverCapabilities.version, (2, 4, 0))
         self.assertFalse(serverCapabilities.is_dev)
 
@@ -410,27 +404,19 @@ class TestFilters(unittest.TestCase):
 
     def test_invalid(self):
         self.assertRaises(api.ShotgunError, api.shotgun._translate_filters, [], "bogus")
-        self.assertRaises(
-            api.ShotgunError, api.shotgun._translate_filters, ["bogus"], "all"
-        )
+        self.assertRaises(api.ShotgunError, api.shotgun._translate_filters, ["bogus"], "all")
 
         filters = [{"filter_operator": "bogus", "filters": []}]
 
-        self.assertRaises(
-            api.ShotgunError, api.shotgun._translate_filters, filters, "all"
-        )
+        self.assertRaises(api.ShotgunError, api.shotgun._translate_filters, filters, "all")
 
         filters = [{"filters": []}]
 
-        self.assertRaises(
-            api.ShotgunError, api.shotgun._translate_filters, filters, "all"
-        )
+        self.assertRaises(api.ShotgunError, api.shotgun._translate_filters, filters, "all")
 
         filters = [{"filter_operator": "all", "filters": {"bogus": "bogus"}}]
 
-        self.assertRaises(
-            api.ShotgunError, api.shotgun._translate_filters, filters, "all"
-        )
+        self.assertRaises(api.ShotgunError, api.shotgun._translate_filters, filters, "all")
 
     @mock.patch.dict(os.environ, {"SHOTGUN_API_DISABLE_ENTITY_OPTIMIZATION": "1"})
     def test_related_object(self):
@@ -608,9 +594,7 @@ class TestFilters(unittest.TestCase):
             ],
         }
         sg = api.Shotgun("http://server_path", "script_name", "api_key", connect=False)
-        result = sg._translate_update_params(
-            entity_type, entity_id, data, multi_entity_update_modes
-        )
+        result = sg._translate_update_params(entity_type, entity_id, data, multi_entity_update_modes)
         self.assertEqual(result, expected)
 
     @mock.patch("shotgun_api3.shotgun.SHOTGUN_API_DISABLE_ENTITY_OPTIMIZATION", False)
@@ -661,9 +645,7 @@ class TestFilters(unittest.TestCase):
             ],
         }
         sg = api.Shotgun("http://server_path", "script_name", "api_key", connect=False)
-        result = sg._translate_update_params(
-            entity_type, entity_id, data, multi_entity_update_modes
-        )
+        result = sg._translate_update_params(entity_type, entity_id, data, multi_entity_update_modes)
         self.assertEqual(result, expected)
 
     @mock.patch("shotgun_api3.shotgun.SHOTGUN_API_DISABLE_ENTITY_OPTIMIZATION", False)
@@ -687,13 +669,7 @@ class TestFilters(unittest.TestCase):
                     "custom_name3": "disposable name 3",
                     "custom_name4": "disposable name 4",
                 },
-                {
-                    "sg_nested": {
-                        "level1": {
-                            "level2": {"id": 123, "type": "Entity", "foo": "bar"}
-                        }
-                    }
-                },
+                {"sg_nested": {"level1": {"level2": {"id": 123, "type": "Entity", "foo": "bar"}}}},
             ],
             "sg_class": {
                 # To be kept
@@ -776,9 +752,7 @@ class TestCerts(unittest.TestCase):
     ]
 
     def setUp(self):
-        self.sg = api.Shotgun(
-            "http://server_path", "script_name", "api_key", connect=False
-        )
+        self.sg = api.Shotgun("http://server_path", "script_name", "api_key", connect=False)
 
         # Get the location of the certs file
         self.certs = self.sg._get_certs_file(None)
@@ -843,9 +817,7 @@ class TestCerts(unittest.TestCase):
         certificate with urllib.
         """
         # First check that we get an error when trying to connect to a known dummy bad URL
-        self.assertRaises(
-            urllib.error.URLError, self._check_url_with_urllib, self.bad_url
-        )
+        self.assertRaises(urllib.error.URLError, self._check_url_with_urllib, self.bad_url)
 
         # Now check that the good urls connect properly using the certs
         for url in self.test_urls:

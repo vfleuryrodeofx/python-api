@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ -*- coding: utf-8 -*-
 # Copyright (c) 2019 Shotgun Software Inc.
 #
 # CONFIDENTIAL AND PROPRIETARY
@@ -12,6 +12,8 @@
 import sys
 from setuptools import setup, find_packages
 
+import package
+
 f = open("README.md")
 readme = f.read().strip()
 
@@ -20,12 +22,12 @@ license = f.read().strip()
 
 setup(
     name="shotgun_api3",
-    version="3.10.2",
+    version="3.10.2" + "+{0}".format(package._rdoVersion),
     description="Flow Production Tracking Python API",
     long_description=readme,
-    author="Autodesk",
-    author_email="https://www.autodesk.com/support",
-    url="https://github.com/shotgunsoftware/python-api",
+    author="Autodesk, RodeoFX",
+    author_email="shotgundev@rodeofx.com",
+    url="https://github.com/rodeofx/python-api",
     license=license,
     packages=find_packages(exclude=("tests",)),
     script_args=sys.argv[1:],
